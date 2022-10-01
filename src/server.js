@@ -5,25 +5,43 @@ import dotenv from "dotenv";
 import pg from "pg";
 
 dotenv.config();
-const user = process.env.user;
-const password = process.env.password;
-const host = process.env.host;
-const port = process.env.port;
-const database = process.env.database;
 const PORT = process.env.PORT;
 
 const { Pool } = pg;
 const connection = new Pool({
-  user,
-  password,
-  host,
-  port,
-  database,
+  connectionString: process.env.DATABASE_URL,
 });
 
-server.get("/users", async (re, res) => {
+server.get("/customers", async (re, res) => {
   try {
-    const users = await connection.query("SELECT * from users;");
+    const users = await connection.query("SELECT * from customers;");
+    res.status(200).send(users.rows);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+server.get("/categories", async (re, res) => {
+  try {
+    const users = await connection.query("SELECT * from categories;");
+    res.status(200).send(users.rows);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+server.get("/games", async (re, res) => {
+  try {
+    const users = await connection.query("SELECT * from games;");
+    res.status(200).send(users.rows);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+server.get("/rentals", async (re, res) => {
+  try {
+    const users = await connection.query("SELECT * from rentals;");
     res.status(200).send(users.rows);
   } catch (err) {
     console.log(err.message);
