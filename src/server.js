@@ -20,15 +20,6 @@ const PORT = process.env.PORT;
 //   }
 // });
 
-// server.get("/games", async (req, res) => {
-//   try {
-//     const users = await connection.query("SELECT * from games;");
-//     res.status(200).send(users.rows);
-//   } catch (err) {
-//     console.log(err.message);
-//   }
-// });
-
 // server.get("/rentals", async (req, res) => {
 //   try {
 //     const users = await connection.query("SELECT * from rentals;");

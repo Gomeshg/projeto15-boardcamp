@@ -6,14 +6,15 @@ async function getCategories(req, res) {
     const users = await connection.query("SELECT * from categories;");
     res.status(200).send(users.rows);
   } catch (err) {
-    console.log(err.message);
+    res.status(500).send(err.message);
   }
 }
 
 async function postCategories(req, res) {
-  const validation = categorieSchema.validate(req.body);
+  const validation = categorieSchema.validate(req.body, { abortEarly: false });
   if (validation.error) {
-    res.status(400).send(validation.error.message);
+    res.status(422).send(validation.error.details.map((item) => item.message));
+    return;
   }
 
   try {
@@ -26,6 +27,7 @@ async function postCategories(req, res) {
         ret = true;
       }
     });
+
     if (ret) {
       return;
     }
@@ -35,7 +37,7 @@ async function postCategories(req, res) {
     ]);
     res.sendStatus(201);
   } catch (err) {
-    console.log(err.message);
+    res.status(500).send(err.message);
   }
 }
 
