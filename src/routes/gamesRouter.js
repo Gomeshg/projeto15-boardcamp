@@ -4,7 +4,7 @@ import { getGames, postGames } from "../controllers/gamesController.js";
 
 const gamesRouter = Router();
 
-gamesRouter.get("/games/:game?", getGames);
+gamesRouter.get("/games/:name?", getGames);
 gamesRouter.post("/game", postGames);
 
 export default gamesRouter;

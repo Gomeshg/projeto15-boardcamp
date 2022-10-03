@@ -1,8 +1,17 @@
 import { Router } from "express";
 
-import { getCustomers, postCustomer } from "../controllers/customersController";
+import {
+  getCustomers,
+  getOneCustomer,
+  postCustomer,
+  updateCustomer,
+} from "../controllers/customersController.js";
 
 const customersRouter = Router();
 
-customersRouter.get("/customers", getCustomers);
-customersRouter.post("/customer", postCustomer);
+customersRouter.get("/customers/:id", getOneCustomer);
+customersRouter.get("/customers/:cpf?", getCustomers);
+customersRouter.put("/customers/:id", updateCustomer);
+customersRouter.post("/customers", postCustomer);
+
+export default customersRouter;
