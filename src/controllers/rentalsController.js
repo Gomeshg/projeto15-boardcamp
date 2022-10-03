@@ -46,7 +46,7 @@ async function postRentals(req, res) {
 
   try {
     const rentals = await connection.query(
-      "SELECT * FROM rentals WHERE gameId=$1;",
+      `SELECT * FROM rentals WHERE "gameId"=$1;`,
       [gameId]
     );
 
@@ -62,17 +62,16 @@ async function postRentals(req, res) {
   const rentDate = dayjs().format("YYYY-MM-DD");
   const returnDate = null;
   const delayFee = null;
-
   try {
     await connection.query(
-      `INSERT INTO rentals("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee");`,
+      `INSERT INTO rentals("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES($1, $2, $3, $4, $5, $6, $7);`,
       [
         customerId,
         gameId,
-        daysRented,
-        originalPrice,
         rentDate,
+        daysRented,
         returnDate,
+        originalPrice,
         delayFee,
       ]
     );
@@ -82,4 +81,68 @@ async function postRentals(req, res) {
   }
 }
 
-export { postRentals };
+async function getRentals(req, res) {
+  try {
+    const rentals =
+      await connection.query(`SELECT rentals.*, customers.id AS customerId, customers.name AS customerName, games.id AS gameId, games.name AS gameName, games."categoryId", games."categoryId", categories.name AS categoryName FROM rentals JOIN customers ON rentals."customerId"=customers.id JOIN games ON rentals."gameId"=games.id JOIN categories ON categories.id=games."categoryId";
+      `);
+
+    const final = [];
+    rentals.rows.forEach((item) => {
+      const customer = {
+        id: item.customerid,
+        name: item.customername,
+      };
+      const game = {
+        id: item.gameid,
+        name: item.gamename,
+        categoryId: item.categoryId,
+        categoryName: item.categoryname,
+      };
+
+      delete item.customerid;
+      delete item.customername;
+      delete item.gameid;
+      delete item.gamename;
+      delete item.categoryId;
+      delete item.categoryname;
+
+      item = {
+        ...item,
+        customer,
+        game,
+      };
+      final.push(item);
+    });
+
+    res.status(200).send(final);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+async function deleteRentals(req, res) {
+  const { id } = req.params;
+  try {
+    const rental = await connection.query(
+      "SELECT * from rentals WHERE id=$1;",
+      [id]
+    );
+    if (rental.rows.length === 0) {
+      res.sendStatus(404);
+      return;
+    }
+
+    if (rental.rows[0].returnDate != null) {
+      res.sendStatus(400);
+      return;
+    }
+
+    await connection.query("DELETE FROM rentals WHERE id=$1;", [id]);
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+export { postRentals, getRentals, deleteRentals };
